@@ -1,5 +1,4 @@
 <script setup>
-import { reactive } from "vue";
 import { RouterLink } from "vue-router";
 import { uid } from "uid";
 
