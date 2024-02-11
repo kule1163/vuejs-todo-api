@@ -14,24 +14,34 @@ console.log("create todo", currentTodo);
 
 const todoItem = reactive({
   todo: `${props.currentId ? currentTodo.value.title : ""}`,
-  inValid: null,
+  inValid: false,
   errMsg: "",
 });
 
 const handleSubmit = async () => {
-  if (props.currentId) {
-    updateTodo({ currentId: props.currentId, title: todoItem.todo });
+  todoItem.inValid = false;
+  if (todoItem.todo == "") {
+    todoItem.inValid = true;
+    todoItem.errMsg = "Todo value cannot be empty";
   } else {
-    createTodo(todoItem.todo);
+    if (props.currentId) {
+      updateTodo({ currentId: props.currentId, title: todoItem.todo });
+    } else {
+      createTodo(todoItem.todo);
+    }
   }
 };
 </script>
 
 <template>
-  <div class="container">
+  <div class="form-container">
     <form @submit.prevent="handleSubmit">
       <div class="form-input">
-        <input type="text" v-model="todoItem.todo" />
+        <input
+          type="text"
+          v-model="todoItem.todo"
+          :class="{ error: todoItem.inValid }"
+        />
         <button type="submit">
           <div v-if="submitLoading" class="spinner">
             <Icon
@@ -44,15 +54,20 @@ const handleSubmit = async () => {
         </button>
       </div>
     </form>
+    <div class="err-msg" v-if="todoItem.inValid">
+      {{ todoItem.errMsg }}
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.container {
+.form-container {
   width: 100%;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   margin-top: 100px;
+
   form {
     .form-input {
       position: relative;
@@ -67,6 +82,9 @@ const handleSubmit = async () => {
         @media (min-width: 600px) {
           width: 360px;
           padding: 22px 80px 22px 18px;
+        }
+        &.error {
+          box-shadow: 0 6px 10px 0 rgba(255, 0, 0, 0.7);
         }
       }
       button {
@@ -109,6 +127,10 @@ const handleSubmit = async () => {
         }
       }
     }
+  }
+  .err-msg {
+    margin-top: 20px;
+    color: red;
   }
 }
 </style>
