@@ -37,7 +37,7 @@ const handleSubmit = async () => {
             <Icon
               icon="fluent:spinner-ios-16-filled"
               color="white"
-              width="18"
+              width="14"
             />
           </div>
           <span v-else>{{ currentId ? "update todo" : "create todo" }}</span>
@@ -89,6 +89,9 @@ const handleSubmit = async () => {
           &:hover {
             animation: test 0.3s;
           }
+        }
+        .spinner {
+          width: 70px;
         }
       }
       @keyframes test {
