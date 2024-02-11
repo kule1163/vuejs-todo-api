@@ -43,7 +43,6 @@ const handleSubmit = async () => {
           <span v-else>{{ currentId ? "update todo" : "create todo" }}</span>
         </button>
       </div>
-      <p>{{ todoItem.todo }}</p>
     </form>
   </div>
 </template>
