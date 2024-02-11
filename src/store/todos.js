@@ -1,5 +1,7 @@
 import axios from "axios";
 import { reactive, toRefs } from "vue";
+import { useRouter } from "vue-router";
+import useGlobal from "./global";
 
 const url = "https://crudapi.co.uk/api/v1/task";
 
@@ -12,9 +14,14 @@ const state = reactive({
   todos: [],
   loading: false,
   currentTodo: null,
+  submitLoading: false,
+  currentTodoLoading: false,
 });
 
 export default function useTodos() {
+  const router = useRouter();
+  const { handleToggleUpdatePopup } = useGlobal();
+
   const getTodos = async () => {
     try {
       state.loading = true;
@@ -36,7 +43,7 @@ export default function useTodos() {
   };
   const createTodo = async (todoContent) => {
     try {
-      state.loading = true;
+      state.submitLoading = true;
 
       const data = JSON.stringify([{ title: todoContent, completed: false }]);
 
@@ -44,18 +51,25 @@ export default function useTodos() {
         headers,
       });
 
-      const todo = res.data.items;
+      const todos = res.data.items;
 
-      console.log("create todo", todo);
+      if (!todos) {
+        throw new Error("something went wrong at createTodo function");
+      }
+
+      /* state.todos.concat(todos); */
+      router.push("/");
+
+      console.log("create todo", todos);
     } catch (error) {
       console.log({ error });
     } finally {
-      state.loading = false;
+      state.submitLoading = false;
     }
   };
   const updateTodo = async ({ currentId, title }) => {
     try {
-      state.loading = true;
+      state.submitLoading = true;
 
       const data = JSON.stringify([{ _uuid: currentId, title }]);
 
@@ -63,13 +77,18 @@ export default function useTodos() {
         headers,
       });
 
-      const updatedTodo = res.data.items;
+      const updatedTodos = res.data.items;
 
-      console.log("update todo", updatedTodo);
+      if (!updatedTodos) {
+        throw new Error("something went wrong at updateTodo function");
+      }
+      state.currentTodo = updatedTodos[0];
+      handleToggleUpdatePopup();
+      console.log("update todo", updatedTodos);
     } catch (error) {
       console.log({ error });
     } finally {
-      state.loading = false;
+      state.submitLoading = false;
     }
   };
   const updateStatus = async ({ currentId, completed }) => {
@@ -84,6 +103,8 @@ export default function useTodos() {
 
       const updateStatus = res.data.items;
 
+      state.currentTodo = updateStatus[0];
+
       console.log("update status", updateStatus);
     } catch (error) {
       console.log({ error });
@@ -95,13 +116,13 @@ export default function useTodos() {
     try {
       state.loading = true;
 
-      const data = JSON.stringify([{ _uuid: currentId }]);
-
-      const res = await axios.delete(url, data, {
+      const res = await axios.delete(url + `/${currentId}`, {
         headers,
       });
 
       const deletedTodo = res.data.items;
+
+      router.push("/");
 
       console.log("delete todo", deletedTodo);
     } catch (error) {
@@ -112,7 +133,7 @@ export default function useTodos() {
   };
   const getCurrentTodo = async (currentId) => {
     try {
-      state.loading = true;
+      state.currentTodoLoading = true;
 
       const res = await axios.get(url + `/${currentId}`, {
         headers,
@@ -126,7 +147,7 @@ export default function useTodos() {
     } catch (error) {
       console.log({ error });
     } finally {
-      state.loading = false;
+      state.currentTodoLoading = false;
     }
   };
   return {

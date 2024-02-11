@@ -1,36 +1,44 @@
 <script setup>
 import useTodos from "@/store/todos";
+import useGlobal from "@/store/global.js";
 import { useRoute } from "vue-router";
 import CreateTodo from "./CreateTodo.vue";
 import { Icon } from "@iconify/vue";
-import { reactive } from "vue";
-
-const compStates = reactive({
-  toggleUpdatePopup: false,
-});
-
-defineEmits(["toggleUpdatePopup", "handleDelete", "handleStatus"]);
 
 const route = useRoute();
 const { id } = route.params;
 
-const { getCurrentTodo, currentTodo, loading } = useTodos();
+const { handleToggleUpdatePopup, toggleUpdatePopup } = useGlobal();
+
+const {
+  getCurrentTodo,
+  currentTodo,
+  currentTodoLoading,
+  submitLoading,
+  updateStatus,
+  deleteTodo,
+} = useTodos();
 
 getCurrentTodo(id);
-
-const toggleUpdatePopup = () => {
-  compStates.toggleUpdatePopup = !compStates.toggleUpdatePopup;
-};
 </script>
 
 <template>
   <div class="container">
-    <h1 v-if="loading">Loading...</h1>
+    <h1 v-if="currentTodoLoading">Loading...</h1>
     <div v-else-if="!currentTodo">todo didnt find</div>
     <div v-else>
       <div class="todo-container">
         <div class="todo-box">
-          <input type="checkbox" />
+          <input
+            type="checkbox"
+            :checked="currentTodo.completed"
+            @input="
+              updateStatus({
+                currentId: currentTodo._uuid,
+                completed: !currentTodo.completed,
+              })
+            "
+          />
           <span>
             {{ currentTodo.title }}
           </span>
@@ -41,18 +49,26 @@ const toggleUpdatePopup = () => {
             icon="ph:pencil-fill"
             color="41b080"
             width="22"
-            @click="toggleUpdatePopup"
+            @click="handleToggleUpdatePopup"
           />
-          <Icon icon="ph:trash" color="f95e5e" width="22" />
+          <Icon
+            icon="ph:trash"
+            color="f95e5e"
+            width="22"
+            @click="deleteTodo(currentTodo._uuid)"
+          />
         </div>
       </div>
     </div>
-    <div v-if="compStates.toggleUpdatePopup" class="popup">
-      <div class="form-container">
+    <div v-if="toggleUpdatePopup" class="popup">
+      <div v-if="submitLoading" class="spinner">
+        <Icon icon="fluent:spinner-ios-16-filled" color="blue" width="40" />
+      </div>
+      <div v-else class="form-container">
         <CreateTodo :currentId="currentTodo._uuid" />
       </div>
 
-      <div class="close-icon" @click="toggleUpdatePopup">
+      <div class="close-icon" @click="handleToggleUpdatePopup">
         <Icon icon="ic:twotone-close" color="fff" width="40" />
       </div>
     </div>
@@ -64,6 +80,7 @@ const toggleUpdatePopup = () => {
   display: flex;
   justify-content: center;
   position: relative;
+  margin-top: 100px;
   .todo-container {
     width: 500px;
     display: flex;
@@ -71,6 +88,9 @@ const toggleUpdatePopup = () => {
     align-items: center;
     flex-wrap: wrap;
     gap: 30px;
+    padding: 15px 30px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
     .todo-box {
       display: flex;
       align-items: center;

@@ -11,5 +11,6 @@ import Todos from "@/components/Todos.vue";
 h1 {
   text-align: center;
   margin-bottom: 20px;
+  margin-top: 40px;
 }
 </style>

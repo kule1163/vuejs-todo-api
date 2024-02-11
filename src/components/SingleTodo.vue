@@ -8,7 +8,10 @@ const props = defineProps({
 
 <template>
   <li class="todo">
-    <RouterLink :to="`/todo/${todo._uuid}`" class="completed">
+    <RouterLink
+      :to="`/todo/${todo._uuid}`"
+      :class="{ completed: todo.completed }"
+    >
       {{ todo.title }}
     </RouterLink>
   </li>
@@ -21,25 +24,31 @@ const props = defineProps({
     width: 100%;
     display: flex;
     padding: 15px;
+    font-size: 1.1rem;
+    font-weight: 500;
     border: 5px solid rgba($color: #ff0000, $alpha: 0.3);
     background-color: rgba($color: #ff0000, $alpha: 0.2);
     border-radius: 12px;
     height: 200px;
-    transform-origin: left top;
+    transform-origin: center;
     transition: all ease 0.5s;
-    animation: rotateIn 0.5s;
-    animation-fill-mode: forwards;
+    animation: scaleMd 0.5s;
     cursor: pointer;
     &:hover {
-      animation: rotateOut 0.5s;
-      border-color: rgba($color: #ff0000, $alpha: 1);
-      background-color: rgba($color: #ff0000, $alpha: 1);
+      transform: scale(1.05);
     }
+    &:not(.completed) {
+      &:hover {
+        border-color: rgba($color: #ff0000, $alpha: 1);
+        background-color: rgba($color: #ff0000, $alpha: 1);
+      }
+    }
+
     &.completed {
       border: 5px solid rgba($color: #2dff00, $alpha: 0.3);
       background-color: rgba($color: #2dff00, $alpha: 0.4);
+      text-decoration: line-through;
       &:hover {
-        animation: rotateOut 0.5s;
         border-color: rgba($color: #2dff00, $alpha: 1);
         background-color: rgba($color: #2dff00, $alpha: 1);
       }
@@ -47,21 +56,20 @@ const props = defineProps({
   }
 }
 
-@keyframes rotateIn {
+@keyframes scaleMd {
   0% {
-    transform: rotate(0);
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  70% {
+    transform: scale(0.9);
   }
   100% {
-    transform: rotate(5deg);
-  }
-}
-
-@keyframes rotateOut {
-  0% {
-    transform: rotate(5deg);
-  }
-  100% {
-    transform: rotate(0);
+    transform: scale(1);
   }
 }
 </style>
