@@ -12,11 +12,12 @@ const { handleToggleUpdatePopup, toggleUpdatePopup } = useGlobal();
 
 const {
   getCurrentTodo,
+  updateStatus,
+  deleteTodo,
   currentTodo,
   currentTodoLoading,
   submitLoading,
-  updateStatus,
-  deleteTodo,
+  deleteLoading,
 } = useTodos();
 
 getCurrentTodo(id);
@@ -24,7 +25,11 @@ getCurrentTodo(id);
 
 <template>
   <div class="container">
-    <h1 v-if="currentTodoLoading">Loading...</h1>
+    <div v-if="currentTodoLoading || deleteLoading" class="spinner-box">
+      <div class="spinner">
+        <Icon icon="fluent:spinner-ios-16-filled" color="blue" width="60" />
+      </div>
+    </div>
     <div v-else-if="!currentTodo">todo didnt find</div>
     <div v-else>
       <div class="todo-container">

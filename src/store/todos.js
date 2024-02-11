@@ -12,10 +12,11 @@ const headers = {
 
 const state = reactive({
   todos: [],
-  loading: false,
   currentTodo: null,
+  loading: false,
   submitLoading: false,
   currentTodoLoading: false,
+  deleteLoading: false,
 });
 
 export default function useTodos() {
@@ -32,9 +33,13 @@ export default function useTodos() {
 
       const todos = res.data.items;
 
-      console.log("get todos", todos);
+      if (!todos) {
+        throw new Error("something went wrong at getTodos function");
+      }
 
       state.todos = todos;
+
+      console.log("get todos", todos);
     } catch (error) {
       console.log({ error });
     } finally {
@@ -93,28 +98,28 @@ export default function useTodos() {
   };
   const updateStatus = async ({ currentId, completed }) => {
     try {
-      state.loading = true;
-
       const data = JSON.stringify([{ _uuid: currentId, completed }]);
 
       const res = await axios.put(url, data, {
         headers,
       });
 
-      const updateStatus = res.data.items;
+      const updatedTodos = res.data.items;
 
-      state.currentTodo = updateStatus[0];
+      if (!updatedTodos) {
+        throw new Error("something went wrong at updateTodo function");
+      }
 
-      console.log("update status", updateStatus);
+      state.currentTodo = updatedTodos[0];
+
+      console.log("update status", updatedTodos);
     } catch (error) {
       console.log({ error });
-    } finally {
-      state.loading = false;
     }
   };
   const deleteTodo = async (currentId) => {
     try {
-      state.loading = true;
+      state.deleteLoading = true;
 
       const res = await axios.delete(url + `/${currentId}`, {
         headers,
@@ -128,7 +133,7 @@ export default function useTodos() {
     } catch (error) {
       console.log({ error });
     } finally {
-      state.loading = false;
+      state.deleteLoading = false;
     }
   };
   const getCurrentTodo = async (currentId) => {
