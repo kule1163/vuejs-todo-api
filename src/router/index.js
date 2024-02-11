@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
+import TodoDetailView from "../views/TodoDetailView.vue";
+import CreateTodoView from "../views/CreateTodoView.vue";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 
 const router = createRouter({
@@ -13,12 +15,12 @@ const router = createRouter({
         {
           path: "",
           name: "home",
-          component: () => HomeView,
+          component: HomeView,
         },
         {
           path: "create",
           name: "create",
-          component: () => import("../views/CreateTodoView.vue"),
+          component: CreateTodoView,
         },
       ],
     },
@@ -30,7 +32,7 @@ const router = createRouter({
         {
           path: ":id",
           name: "todo-detail",
-          component: () => import("../views/TodoDetailView.vue"),
+          component: TodoDetailView,
         },
       ],
     },
