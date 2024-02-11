@@ -126,7 +126,7 @@ getCurrentTodo(id);
     align-items: center;
     justify-content: center;
     background-color: rgba($color: #000000, $alpha: 0.8);
-    z-index: 2;
+    z-index: 20;
     .close-icon {
       position: absolute;
       right: 50px;
